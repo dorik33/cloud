@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  pg:
+    image: postgres:14-alpine3.17
+    container_name: cloud
+    environment:
+      - POSTGRES_DB=cloud
+      - POSTGRES_USER=userr
+      - POSTGRES_PASSWORD=1234
+    ports:
+      - "5433:5432"  
+    volumes:
+      - pgdata:/var/lib/postgresql/data  
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U userr -d cloud"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    image: load_balancer
+    container_name: test_cloud
+    ports:
+      - "8085:8085"  
+    environment:
+      - DATABASE_URL=postgres://userr:1234@pg:5432/cloud?sslmode=disable
+    depends_on:
+      pg:
+        condition: service_healthy
+    volumes:
+      - ./configs/config.yaml:/app/configs/config.yaml
+
+volumes:
+  pgdata: 

@@ -1,0 +1,13 @@
+port: "8085"
+
+backends:
+  - http://localhost:8001
+  - http://localhost:8002
+  - http://localhost:8003
+  - http://localhost:8004
+
+rate_limit:
+  default_capacity: 100
+  default_rate: 1
+
+db_conn_str: postgres://userr:1234@pg:5432/cloud?sslmode=disable
